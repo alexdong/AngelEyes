@@ -1,93 +1,93 @@
 # AngelEyes Implementation Plan
 
 ## Project Setup
-- [ ] Rename package from `python_template` to `angeleyes`
-- [ ] Update pyproject.toml dependencies to include image processing libraries
-- [ ] Create package directory structure under `angeleyes/`
-- [ ] Set up logging configuration with loguru
+- [x] Rename package from `python_template` to `angeleyes`
+- [x] Update pyproject.toml dependencies to include image processing libraries
+- [x] Create package directory structure under `angeleyes/`
+- [x] Set up logging configuration with loguru
 
 ## Core Architecture
 
 ### 1. Focus Monitoring Module (`angeleyes/focus/`)
-- [ ] Create `screenshot.py` for macOS screenshot capture
-  - [ ] Implement `screencapture -x` command wrapper (silent capture)
-  - [ ] Capture full monitor screenshot
-  - [ ] Save screenshots to `/tmp/{timestamp}.jpg` for verification
-  - [ ] Handle screenshot capture errors gracefully
-- [ ] Create `monitor.py` for background monitoring loop
-  - [ ] Implement 60-second interval timer
-  - [ ] Integrate with LLM client for distraction detection
-  - [ ] Trigger voice alerts when distracted
-- [ ] Create `models.py` with Pydantic models
-  - [ ] FocusCheckRequest model (image, goal, timestamp)
-  - [ ] FocusCheckResponse model (is_focused, confidence, reason)
+- [x] Create `screenshot.py` for macOS screenshot capture
+  - [x] Implement `screencapture -x` command wrapper (silent capture)
+  - [x] Capture full monitor screenshot
+  - [x] Save screenshots to `/tmp/{timestamp}.jpg` for verification
+  - [x] Handle screenshot capture errors gracefully
+- [x] Create `monitor.py` for background monitoring loop
+  - [x] Implement 60-second interval timer
+  - [x] Integrate with LLM client for distraction detection
+  - [x] Trigger voice alerts when distracted
+- [x] Create `models.py` with Pydantic models
+  - [x] FocusCheckRequest model (image, goal, timestamp)
+  - [x] FocusCheckResponse model (is_focused, confidence, reason)
 
 ### 2. Posture Monitoring Module (`angeleyes/posture/`)
-- [ ] Create `webcam.py` for webcam capture
-  - [ ] Implement webcam capture using opencv-python or imageio
-  - [ ] Save webcam images to `/tmp/{timestamp}.jpg` for verification
-  - [ ] Handle webcam availability and permissions
-- [ ] Create `monitor.py` for background monitoring
-  - [ ] Implement 20-second interval capture (3 per minute)
-  - [ ] Batch send 3 images to LLM for posture analysis
-  - [ ] Trigger voice alerts for incorrect posture
-- [ ] Create `models.py` with Pydantic models
-  - [ ] PostureCheckRequest model (images[], timestamp)
-  - [ ] PostureCheckResponse model (is_correct, confidence, issues)
+- [x] Create `webcam.py` for webcam capture
+  - [x] Implement webcam capture using opencv-python or imageio
+  - [x] Save webcam images to `/tmp/{timestamp}.jpg` for verification
+  - [x] Handle webcam availability and permissions
+- [x] Create `monitor.py` for background monitoring
+  - [x] Implement 20-second interval capture (3 per minute)
+  - [x] Batch send 3 images to LLM for posture analysis
+  - [x] Trigger voice alerts for incorrect posture
+- [x] Create `models.py` with Pydantic models
+  - [x] PostureCheckRequest model (images[], timestamp)
+  - [x] PostureCheckResponse model (is_correct, confidence, issues)
 
 ### 3. LLM Integration (`angeleyes/llm/`)
-- [ ] Create `client.py` for LMStudio API communication
-  - [ ] Implement OpenAI-compatible API client using httpx
-  - [ ] Add base64 image encoding for multimodal requests
-  - [ ] Handle connection errors and retries
-  - [ ] Verify LMStudio server is running on startup
-- [ ] Create `prompts.py` with Jinja2 templates
-  - [ ] Focus monitoring prompt template with goal interpolation
-  - [ ] Posture monitoring prompt template
-  - [ ] Make prompts configurable via config file
+- [x] Create `client.py` for LMStudio API communication
+  - [x] Implement OpenAI-compatible API client using httpx
+  - [x] Add base64 image encoding for multimodal requests
+  - [x] Handle connection errors and retries
+  - [x] Verify LMStudio server is running on startup
+- [x] Create `prompts.py` with Jinja2 templates
+  - [x] Focus monitoring prompt template with goal interpolation
+  - [x] Posture monitoring prompt template
+  - [x] Make prompts configurable via config file
 
 ### 4. CLI Interface (`angeleyes/cli/`)
-- [ ] Create `main.py` with Rich-based CLI (CLI-only, no GUI)
-  - [ ] Implement `start` command
-    - [ ] Interactive goal prompt using prompt-toolkit via CLI
-    - [ ] Validate LMStudio connection before starting
-    - [ ] Start both monitoring threads in background
-    - [ ] Display monitoring status with Rich console
-  - [ ] Implement graceful shutdown with Ctrl+C
-    - [ ] Stop monitoring threads cleanly
-    - [ ] Save any pending data
-  - [ ] Implement `status` command (if running in separate terminal)
-    - [ ] Show current monitoring state
-    - [ ] Display last check results
-    - [ ] Show uptime and check counts
-- [ ] Add keyboard interrupt handler (Ctrl+C) for clean shutdown
+- [x] Create `main.py` with Rich-based CLI (CLI-only, no GUI)
+  - [x] Implement `start` command
+    - [x] Interactive goal prompt using prompt-toolkit via CLI
+    - [x] Validate LMStudio connection before starting
+    - [x] Start both monitoring threads in background
+    - [x] Display monitoring status with Rich console
+  - [x] Implement graceful shutdown with Ctrl+C
+    - [x] Stop monitoring threads cleanly
+    - [x] Save any pending data
+  - [x] Implement `status` command (if running in separate terminal)
+    - [x] Show current monitoring state
+    - [x] Display last check results
+    - [x] Show uptime and check counts
+- [x] Add keyboard interrupt handler (Ctrl+C) for clean shutdown
 
 ### 5. Voice Alerts (`angeleyes/utils/`)
-- [ ] Create `voice.py` for macOS text-to-speech
-  - [ ] Wrapper around `say` command
-  - [ ] Queue system to prevent overlapping alerts
-  - [ ] Configurable voice and speech rate
-- [ ] Create `config.py` for configuration management
-  - [ ] Load settings from YAML/TOML file
-  - [ ] Alert message templates
-  - [ ] Check intervals and thresholds
-  - [ ] LMStudio server URL configuration
+- [x] Create `voice.py` for macOS text-to-speech
+  - [x] Wrapper around `say` command
+  - [x] Queue system to prevent overlapping alerts
+  - [x] Configurable voice and speech rate
+- [x] Create `config.py` for configuration management
+  - [x] Load settings from YAML/TOML file
+  - [x] Alert message templates
+  - [x] Check intervals and thresholds
+  - [x] LMStudio server URL configuration
 
 ### 6. Main Application (`angeleyes/`)
-- [ ] Create `__init__.py` with package metadata
-- [ ] Create `app.py` with main application orchestration
-  - [ ] Thread management for concurrent monitoring
-  - [ ] Shared state for goal and monitoring status
-  - [ ] Graceful error handling and recovery
+- [x] Create `__init__.py` with package metadata
+- [x] Create `app.py` with main application orchestration
+  - [x] Thread management for concurrent monitoring
+  - [x] Shared state for goal and monitoring status
+  - [x] Graceful error handling and recovery
 
 ## Testing
 
 ### Unit Tests (`tests/unit/`)
-- [ ] Test screenshot capture functionality
-- [ ] Test webcam capture functionality
-- [ ] Test LLM client with mock responses
-- [ ] Test prompt template rendering
-- [ ] Test voice alert queueing
+- [x] Test screenshot capture functionality
+- [x] Test webcam capture functionality
+- [x] Test LLM client with mock responses
+- [x] Test prompt template rendering
+- [x] Test voice alert queueing
 
 ### Integration Tests (`tests/integration/`)
 - [ ] Test full focus monitoring flow
