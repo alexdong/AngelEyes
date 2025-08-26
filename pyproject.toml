@@ -1,7 +1,7 @@
 [project]
-name = "quinn"
+name = "angeleyes"
 version = "0.1.0"
-description = "AI-powered email rubber duck for guided problem-solving"
+description = "Vision-based focus and posture monitoring assistant"
 requires-python = ">=3.13"
 dependencies = [
     "pydantic",
@@ -20,10 +20,10 @@ dependencies = [
 ]
 
 [project.scripts]
-quinn = "quinn.cli:main"
+angeleyes = "angeleyes.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["quinn*"]
+include = ["angeleyes*"]
 exclude = ["llms*"]
 
 [tool.uv]
@@ -90,7 +90,7 @@ extend-ignore = [
 max-complexity = 5
 
 [tool.pytest.ini_options]
-testpaths = ["quinn", "tests"]
+testpaths = ["angeleyes", "tests"]
 python_files = ["*_test.py"]
 addopts = "-vv --tb=short"
 asyncio_mode = "auto"

@@ -1,10 +1,10 @@
-# Python Template Documentation
+# AngelEyes Documentation
 
-Welcome to the Python Template documentation. This is a modern Python project template with comprehensive tooling and best practices built-in.
+Welcome to AngelEyes documentation. AngelEyes is a vision-based focus and posture monitoring assistant using local multimodal AI models.
 
 ## 🚀 Quick Start
 
-1. Clone the repository: `git clone https://github.com/username/python-template.git`
+1. Clone the repository: `git clone https://github.com/username/angeleyes.git`
 2. Install uv: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 3. Install dependencies: `uv pip install -r pyproject.toml`
 4. Run tests: `make test`
@@ -66,6 +66,6 @@ Contributions are welcome! Please read the coding standards in `Python.md` befor
 
 ---
 
-[GitHub Repository](https://github.com/username/python-template) | 
-[Issues](https://github.com/username/python-template/issues) | 
-[Pull Requests](https://github.com/username/python-template/pulls)
+[GitHub Repository](https://github.com/username/angeleyes) | 
+[Issues](https://github.com/username/angeleyes/issues) | 
+[Pull Requests](https://github.com/username/angeleyes/pulls)
