@@ -1,6 +1,7 @@
 """LLM client for communication with LMStudio."""
 
 import base64
+import json
 from pathlib import Path
 from types import TracebackType
 from typing import Any
@@ -62,7 +63,11 @@ class LMStudioClient:
         try:
             response = await self.client.get("/models")
             http_ok = 200
-            return response.status_code == http_ok
+            if response.status_code == http_ok:
+                logger.debug(f"LMStudio models available: {response.json()}")
+                return True
+            logger.error(f"LMStudio returned status {response.status_code}")
+            return False
         except Exception as e:
             logger.error(f"Failed to connect to LMStudio: {e}")
             return False
@@ -77,6 +82,11 @@ class LMStudioClient:
         try:
             image_base64 = self._encode_image(request.image_path)
             prompt = FOCUS_CHECK_PROMPT.render(goal=request.goal)
+
+            # Log the image path for debugging
+            logger.debug(f"Checking focus with image: {request.image_path}")
+            logger.debug(f"Goal: {request.goal}")
+            logger.debug(f"Image size: {len(image_base64)} bytes (base64)")
 
             messages = [
                 {
@@ -93,18 +103,39 @@ class LMStudioClient:
                 }
             ]
 
+            request_data = {
+                "model": self.config.model,
+                "messages": messages,
+                "max_tokens": 200,
+                "temperature": 0.7,
+            }
+
+            logger.debug(
+                f"Sending request to LMStudio: {self.config.base_url}/chat/completions"
+            )
+            logger.debug(f"Request model: {self.config.model}")
+
             response = await self.client.post(
                 "/chat/completions",
-                json={
-                    "model": self.config.model,
-                    "messages": messages,
-                    "max_tokens": 200,
-                },
+                json=request_data,
             )
+
+            logger.debug(f"LMStudio response status: {response.status_code}")
+
+            http_ok = 200
+            if response.status_code != http_ok:
+                logger.error(f"LMStudio error response: {response.text}")
+                raise Exception(
+                    f"LMStudio returned {response.status_code}: {response.text}"
+                )
+
             response.raise_for_status()
 
             result = response.json()
+            logger.debug(f"LMStudio response: {json.dumps(result, indent=2)}")
+
             content = result["choices"][0]["message"]["content"]
+            logger.info(f"LLM focus check response: {content[:200]}")
 
             # Parse LLM response (simplified parsing - in production use structured output)
             is_focused = "true" in content.lower() or "focused" in content.lower()
@@ -117,7 +148,7 @@ class LMStudioClient:
             )
 
         except Exception as e:
-            logger.error(f"Focus check failed: {e}")
+            logger.error(f"Focus check failed: {e}", exc_info=True)
             return FocusCheckResponse(
                 is_focused=True,
                 confidence=0.5,
@@ -141,7 +172,24 @@ class LMStudioClient:
     async def check_posture(self, request: PostureCheckRequest) -> PostureCheckResponse:
         """Check user's posture from webcam images."""
         try:
-            images_base64 = [self._encode_image(path) for path in request.image_paths]
+            logger.debug(f"Checking posture with {len(request.image_paths)} images")
+
+            images_base64 = []
+            for path in request.image_paths:
+                if path.exists():
+                    images_base64.append(self._encode_image(path))
+                    logger.debug(f"Encoded image: {path}")
+                else:
+                    logger.warning(f"Image not found: {path}")
+
+            if not images_base64:
+                logger.warning("No valid images for posture check")
+                return PostureCheckResponse(
+                    is_correct=True,
+                    confidence=0.5,
+                    issues=["No images available for analysis"],
+                )
+
             prompt = POSTURE_CHECK_PROMPT.render()
 
             content_parts: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
@@ -157,18 +205,38 @@ class LMStudioClient:
 
             messages = [{"role": "user", "content": content_parts}]
 
+            request_data = {
+                "model": self.config.model,
+                "messages": messages,
+                "max_tokens": 200,
+                "temperature": 0.7,
+            }
+
+            logger.debug(
+                f"Sending posture check to LMStudio with {len(images_base64)} images"
+            )
+
             response = await self.client.post(
                 "/chat/completions",
-                json={
-                    "model": self.config.model,
-                    "messages": messages,
-                    "max_tokens": 200,
-                },
+                json=request_data,
             )
+
+            logger.debug(f"LMStudio posture response status: {response.status_code}")
+
+            http_ok = 200
+            if response.status_code != http_ok:
+                logger.error(f"LMStudio error response: {response.text}")
+                raise Exception(
+                    f"LMStudio returned {response.status_code}: {response.text}"
+                )
+
             response.raise_for_status()
 
             result = response.json()
+            logger.debug(f"LMStudio posture response: {json.dumps(result, indent=2)}")
+
             content = result["choices"][0]["message"]["content"]
+            logger.info(f"LLM posture check response: {content[:200]}")
 
             # Parse LLM response
             is_correct = "correct" in content.lower() or "good" in content.lower()
@@ -181,7 +249,7 @@ class LMStudioClient:
             )
 
         except Exception as e:
-            logger.error(f"Posture check failed: {e}")
+            logger.error(f"Posture check failed: {e}", exc_info=True)
             return PostureCheckResponse(
                 is_correct=True,
                 confidence=0.5,
