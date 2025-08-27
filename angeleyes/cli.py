@@ -5,8 +5,6 @@ import sys
 
 import click
 import httpx
-from prompt_toolkit import prompt
-from prompt_toolkit.styles import Style
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -16,13 +14,6 @@ from angeleyes.utils.logger import logger
 
 console = Console()
 HTTP_OK = 200
-
-custom_style = Style.from_dict(
-    {
-        "": "#ffffff",
-        "prompt": "#00aa00 bold",
-    }
-)
 
 
 def check_lmstudio() -> None:
@@ -58,16 +49,14 @@ def display_welcome() -> None:
 def get_user_goal() -> str:
     """Get goal from user interactively."""
     try:
-        goal = prompt(
-            "What is your goal for this session? ",
-            style=custom_style,
-        )
+        # Use Rich's console.input for better formatting and echo
+        goal = console.input("[green]What is your goal for this session?[/green] ")
 
         if not goal.strip():
             console.print("[red]Goal cannot be empty. Exiting.[/red]")
             sys.exit(1)
 
-        return goal
+        return goal.strip()
 
     except (KeyboardInterrupt, EOFError):
         console.print("\n[yellow]Cancelled by user.[/yellow]")

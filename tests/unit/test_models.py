@@ -3,8 +3,6 @@
 from datetime import datetime
 from pathlib import Path
 
-import pytest
-
 from angeleyes.models.base import (
     FocusCheckRequest,
     FocusCheckResponse,
@@ -13,7 +11,7 @@ from angeleyes.models.base import (
 )
 
 
-def test_focus_check_request():
+def test_focus_check_request() -> None:
     """Test FocusCheckRequest model."""
     request = FocusCheckRequest(
         image_path=Path("/tmp/test.jpg"),
@@ -24,7 +22,7 @@ def test_focus_check_request():
     assert isinstance(request.timestamp, datetime)
 
 
-def test_focus_check_response():
+def test_focus_check_response() -> None:
     """Test FocusCheckResponse model."""
     response = FocusCheckResponse(
         is_focused=True,
@@ -36,7 +34,7 @@ def test_focus_check_response():
     assert response.reason == "User is working on documentation"
 
 
-def test_posture_check_request():
+def test_posture_check_request() -> None:
     """Test PostureCheckRequest model."""
     request = PostureCheckRequest(
         image_paths=[Path("/tmp/img1.jpg"), Path("/tmp/img2.jpg")],
@@ -45,7 +43,7 @@ def test_posture_check_request():
     assert isinstance(request.timestamp, datetime)
 
 
-def test_posture_check_response():
+def test_posture_check_response() -> None:
     """Test PostureCheckResponse model."""
     response = PostureCheckResponse(
         is_correct=False,
